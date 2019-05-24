@@ -112,9 +112,6 @@ class ImagesLayout {
 
     images.forEach((item, i) => {
       if (i === 0) {
-        console.log(item.height)
-        console.log(item.width)
-        console.log(ratios[i])
         // 第一张图片
         // 通过图片相对宽度与相对总宽度的比值计算出在容器中占据的宽度与高度
         item.width = parseInt(this.containerWidth * (widths[i] / totalWidth))
@@ -137,6 +134,7 @@ class ImagesLayout {
         // 图片布局后剩余的容器宽度
         leftWidth = leftWidth - item.width
       }
+      console.log(item)
       this.completedImages.push(item)
     })
   }

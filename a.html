@@ -11,24 +11,42 @@
             padding: 0;
         }
         #box{
-            width: 1000px;
+            width: 100%;
             margin:  0 auto;
-            min-height:500px; 
+            min-height:500px;
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: flex-start;
+        }
+        .item{
+            padding: 2px;
+            box-sizing: border-box;
+            width: 250px;
+            overflow: hidden;
+        }
+        .item img{
+            display: block;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-    <div id="box"></div>
+    <div id="box">
+     
+    </div>
 </body>
 <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
 </script>
+<script src="./a.js"></script>
 <script>
     var $box = $('#box');
     var getData =function(){
+          console.log(22)
         return new Promise((resolve,reject)=>{
         $.ajax({
             type: 'GET',
-            url: 'http://172.18.255.191/wallpapers.php?paged=1&posts_per_page=14&orderby=date&order=DESC&s=&attachment_category=&attachment_tag=',
+            url: 'https://www.u-launcher.com/wallpapers.php?paged=1&posts_per_page=9&orderby=date&order=DESC&s=&attachment_category=&attachment_tag=',
             dataType: 'json',
             success: function (res) {
                 let data = res.data;
@@ -41,113 +59,38 @@
     })
     }
     getData().then(data=>{
-        const layout = new WaterFall(data);
-        layout.getImagesWidth()
+        const layout = new WaterFall('#box',{
+            data,
+            numberLine:4,
+            showOneImg:500
+        });
+        // layout.getImagesWidth()
     })
-</script>
-<script>
-class  WaterFall {
-    constructor(images,boxWidth=1000,numberLine=6,radio = 1.5){
-        /**
-         * @param images 传入的数据列表 图片列表
-         * {Object} 每个对象中有一个src的属性
-         * 
-         * @param boxWidth 容器宽度
-         * @param numberLine 单行要显示图片的数量
-         * @param radio 图片宽高比
+    /*
+var flag = false;
+      $(window).scroll(function(){
+        //   if(flag){
+        //       return
+        //   }
+          flag = !flag;
+             var windowHeight = $(window).height();//当前窗口的高度             
+             var scrollTop = $(window).scrollTop();//当前滚动条从上往下滚动的距离            
+             var docHeight = $(document).height(); //当前文档的高度 
+             //当 滚动条距底部的距离 + 滚动条滚动的距离 >= 文档的高度 - 窗口的高度  
+             console.log('scrollTop + windowHeight + docHeight:'+scrollTop + '-'+windowHeight+ '-' + docHeight)
+             if (scrollTop + windowHeight >= docHeight) {  
+                 //加载更多数据
+                 getData().then(data=>{
+                const layout = new WaterFall('#box',{
+                    data,
+                    numberLine:4
+                });
+          flag = !flag;
+        // layout.getImagesWidth()
+    })
+             }
+         });
         */
-        this.images = images;
-        this.boxWidth = boxWidth;
-        this.numberLine = numberLine;
-        this.radio = radio;
-        //假定高度
-        this.assumeH = this.boxWidth / this.radio;
-
-
-        this.imagesLayout();
-    }
-
-
-    //图片布局
-    imagesLayout(){
-        //当图片只有一张时,完整显示图片
-        if(this.images.length === 1){
-            
-            return
-        }
-        //图片大于一张,排序分行处理
-        let imagesBox = [];
-        for(let i = 0,l = this.images.length;i<l;i++){
-            imagesBox.push(this.images[i]);
-            //当达到图片布局限制的数量时
-            //当已经是最后一张图片时
-            if(imagesBox.length === this.numberLine || i === this.images.length - 1){
-                this.computedImagesLayout(imagesBox);
-                imagesBox = [];
-            }
-        }
-
-    }
-
-    //分块计算图片信息
-    computedImagesLayout(imagesBox){
-        //当分组只有一张图片时
-        if(imagesBox.length === 1){
-            return
-        }else{
-            this.computedMoreImages(imagesBox);
-        }
-    }
-
-    //分组中多张图片布局
-    computedMoreImages(imagesBox){
-
-        let imagesWidths = [],imagesRadios = [];
-        imagesBox.forEach(item=>{
-            this.getImagesWidth(item,function(obj){
-               /**
-                * obj 根据图片的src获取相关信息
-                * radio 图片的宽高比
-                * assumeW 根据图片的假定高度获取到假定宽度
-               */
-              imagesWidths.push(obj.assumeW);
-              imagesRadios.push(obj.radio);
-            })
-setTimeout(()=>{
-            let totalWidth =imagesWidths.reduce((sum,item)=>{
-                sum + item;
-            },0)
-            console.log(totalWidth)
-        },5000)
-        })
-    }
-
-    //根据比例获取获取图片的宽
-    getImagesWidth(element,callback){
-            let img = new Image();
-            img.src = element.url; 
-            return new Promise((resolve,reject)=>{
-                if(img.complete){
-                    let w = img.width;
-                    let h = img.height;
-                    let radio = w / h;
-                    let assumeW = radio * this.assumeH;
-                    callback({radio,assumeW})
-                }else{
-                    img.onload = ()=>{
-                        let w = img.width;
-                        let h = img.height;
-                        let radio = w / h;
-                        let assumeW = radio * this.assumeH;
-                        callback({radio,assumeW})
-                    } 
-                }
-
-            })
-
-                
-
-    }
-}
 </script>
+
 </html>
